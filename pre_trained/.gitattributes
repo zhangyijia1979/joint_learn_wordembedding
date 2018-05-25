@@ -1,2 +1,0 @@
-pubmed_mesh_100_10_model_wv.bin.gz.001 filter=lfs diff=lfs merge=lfs -text
-pubmed_mesh_100_10_model_wv.bin.gz.002 filter=lfs diff=lfs merge=lfs -text
