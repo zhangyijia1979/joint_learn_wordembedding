@@ -8,7 +8,6 @@ import argparse
 import networkx as nx
 import node2vec
 from gensim.models import FastText
-from gensim.models.fasttext import logger,FAST_VERSION
 import random
 import gzip
 import pickle as pkl
@@ -37,9 +36,9 @@ def parse_args():
 	                    help='Number of dimensions. Default is 200.')
 
 	parser.add_argument('--walk-length', type=int, default=50,
-	                    help='Length of walk per source. Default is 50.')
+	                    help='Length of walk per source. Default is 100.')
 
-	parser.add_argument('--num-walks', type=int, default=2,
+	parser.add_argument('--num-walks', type=int, default=5,
 	                    help='Number of walks per source. Default is 10.')
 
 	parser.add_argument('--windows', type=int, default=5,
@@ -58,7 +57,7 @@ def parse_args():
 	                    help='Number of parallel workers. Default is 8.')
 
 	parser.add_argument('--p', type=float, default=2,
-	                    help='Return hyperparameter. Default is 2.')
+	                    help='Return hyperparameter. Default is 1.')
 
 	parser.add_argument('--q', type=float, default=1,
 	                    help='Inout hyperparameter. Default is 1.')
@@ -71,24 +70,24 @@ def parse_args():
 	return parser.parse_args()
 
 class MySentences(object):
-	def __init__(self, pubmed_file):
-
+	def __init__(self, mesh_list,pubmed_file):
+		self.mesh_list = mesh_list
 		self.pubmed_file=pubmed_file
-
 	def __iter__(self):
 
-		for line in open(self.pubmed_file,'r'):
+		for instance in self.mesh_list:
+
+			yield instance
+
+		for line in open(self.pubmed_file, 'r'):
 			yield str(line).split()
 
 
-
 def main(args):
-
 	f_pkl = gzip.open(args.input_dic, 'r')
-
-	supplement_dict = pkl.load(f_pkl)
+	mesh_dict = pkl.load(f_pkl)
 	f_pkl.close()
-	print(FAST_VERSION)
+
 
 	G = nx.read_edgelist(args.input_mesh, nodetype=str, create_using=nx.DiGraph())
 	for edge in G.edges():
@@ -112,31 +111,18 @@ def main(args):
 		temp_list=[]
 		for node in instance:
 			node_set.add(node)
-			if node in supplement_dict:
-				temp_list.append(supplement_dict[node])
-
+			if node in mesh_dict:
+				temp_list.append(mesh_dict[node])
 		new_walks.append(temp_list)
 
-
-	sentences = list(MySentences(args.input_corpus))
-
-	sentences.extend(new_walks)
-
-	random.shuffle(sentences)
-
-	model = FastText(size=args.dimensions, window=args.windows, min_count=args.min_count, workers=args.workers,
+	model = FastText(MySentences(new_walks,args.input_corpus), size=args.dimensions, window=args.windows, min_count=args.min_count, workers=args.workers,
 					 sg=args.sg, iter=args.iter)
 
-	model.build_vocab(sentences)
-
-	model.train(sentences, total_examples=model.corpus_count, epochs=model.iter)
-
-	#model.save(args.output_model)
+	model.save(args.output_model)
 
 	print(model)
 
 	model.wv.save_word2vec_format(args.output_bin, binary=True)
-
 
 if __name__ == "__main__":
 	args = parse_args()
