@@ -20,10 +20,10 @@ def parse_args():
 	parser.add_argument('--input_corpus', nargs='?', default='./data/pubmed_sample',
 	                    help='Input biomedical corpus')
 
-	parser.add_argument('--input_mesh', nargs='?', default='./data/graph_mesh_sample.edgelist',
+	parser.add_argument('--input_mesh', nargs='?', default='./data/MeSH_graph.edgelist',
 						help='Input mesh knowledge')
 
-	parser.add_argument('--input_dic', nargs='?', default='./data/mesh_dic.pkl.gz',
+	parser.add_argument('--input_dic', nargs='?', default='./data/MeSH_dic.pkl.gz',
 						help='Input mesh dic')
 
 	parser.add_argument('--output_model', nargs='?', default='./pubmed_mesh_test',
