@@ -1,4 +1,4 @@
-BioWordVec: Improving Biomedical Word Embeddings with Subowrd Information and MeSH Ontology 
+BioWordVec: Improving Biomedical Word Embeddings with Subowrd Information and MeSH
 ================================================================================
 
 This sourcecode is a demo implementation described in the paper "BioWordVec:Improving Biomedical Word Embeddings with Subowrd Information and MeSH."
